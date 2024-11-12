@@ -1,65 +1,135 @@
-#Write a program for analysis of quick sort by using deterministic and randomized variant
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
+import java.util.Scanner;
 
-public class QuickSortAnalysis {
+class Main {
+    
+    // Function to perform deterministic Quick Sort
+    public static int deterministicPartition(ArrayList<Integer> arr, int low, int high) {
+        int pivot = arr.get(low); // Pivot is the first element
+        int left = low + 1;
+        int right = high;
+
+        while (true) {
+            while (left <= right && arr.get(left) <= pivot) {
+                left++;
+            }
+            while (left <= right && arr.get(right) >= pivot) {
+                right--;
+            }
+            if (left > right) {
+                break;
+            }
+            Collections.swap(arr, left, right);
+        }
+        Collections.swap(arr, low, right);
+        return right;
+    }
+
+    public static void deterministicQuickSort(ArrayList<Integer> arr, int low, int high, int[] comparisons, int[] swaps) {
+        if (low < high) {
+            int pivotIndex = deterministicPartition(arr, low, high);
+            comparisons[0] += (high - low); // Count comparisons made during partition
+            swaps[0] += 2;                  // Count the swaps made during partition
+
+            deterministicQuickSort(arr, low, pivotIndex - 1, comparisons, swaps);
+            deterministicQuickSort(arr, pivotIndex + 1, high, comparisons, swaps);
+        }
+    }
+
+    // Function to perform randomized Quick Sort
+    public static int randomizedPartition(ArrayList<Integer> arr, int low, int high) {
+        int pivotIndex = low + new Random().nextInt(high - low + 1);
+        Collections.swap(arr, low, pivotIndex); // Swap pivot with the first element
+        int pivot = arr.get(low);
+        int left = low + 1;
+        int right = high;
+
+        while (true) {
+            while (left <= right && arr.get(left) <= pivot) {
+                left++;
+            }
+            while (left <= right && arr.get(right) >= pivot) {
+                right--;
+            }
+            if (left > right) {
+                break;
+            }
+            Collections.swap(arr, left, right);
+        }
+        Collections.swap(arr, low, right);
+        return right;
+    }
+
+    public static void randomizedQuickSort(ArrayList<Integer> arr, int low, int high, int[] comparisons, int[] swaps) {
+        if (low < high) {
+            int pivotIndex = randomizedPartition(arr, low, high);
+            comparisons[0] += (high - low); // Count comparisons made during partition
+            swaps[0] += 2;                  // Count the swaps made during partition
+
+            randomizedQuickSort(arr, low, pivotIndex - 1, comparisons, swaps);
+            randomizedQuickSort(arr, pivotIndex + 1, high, comparisons, swaps);
+        }
+    }
+
+    // Function to print the array
+    public static void printArray(ArrayList<Integer> arr) {
+        for (int num : arr) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+    }
+
     public static void main(String[] args) {
-        int[] arr = {5, 2, 9, 3, 6, 8, 1, 7};
+        Scanner scanner = new Scanner(System.in);
 
-        // Analyze the deterministic variant
-        long startTimeDeterministic = System.nanoTime();
-        deterministicQuickSort(arr.clone());
-        long endTimeDeterministic = System.nanoTime();
-        long executionTimeDeterministic = endTimeDeterministic - startTimeDeterministic;
+        System.out.print("Enter the number of elements: ");
+        int n = scanner.nextInt();
+        ArrayList<Integer> arr1 = new ArrayList<>();
+        
+        System.out.println("Enter elements: ");
+        for (int i = 0; i < n; i++) {
+            arr1.add(scanner.nextInt());
+        }
+        ArrayList<Integer> arr2 = new ArrayList<>(arr1);
 
-        System.out.println("Deterministic Variant Sorted Array: " + Arrays.toString(arr));
-        System.out.println("Deterministic Variant Execution Time: " + executionTimeDeterministic + " nanoseconds");
+        int ch;
+        while (true) {
+            int[] comparisonsDet = {0}, swapsDet = {0};
+            int[] comparisonsRand = {0}, swapsRand = {0};
 
-        // Analyze the randomized variant
-        long startTimeRandomized = System.nanoTime();
-        randomizedQuickSort(arr.clone());
-        long endTimeRandomized = System.nanoTime();
-        long executionTimeRandomized = endTimeRandomized - startTimeRandomized;
+            System.out.println("1.Deterministic Quick Sort\n2.Randomized Quick Sort\n3.Exit");
+            System.out.print("Enter your choice: ");
+            ch = scanner.nextInt();
+            
+            if (ch == 1) {
+                System.out.println("Original array for deterministic quick sort:");
+                printArray(arr1);
 
-        System.out.println("Randomized Variant Sorted Array: " + Arrays.toString(arr));
-        System.out.println("Randomized Variant Execution Time: " + executionTimeRandomized + " nanoseconds");
-    }
+                deterministicQuickSort(arr1, 0, arr1.size() - 1, comparisonsDet, swapsDet);
 
-    public static void deterministicQuickSort(int[] arr) {
-        if (arr.length <= 1) {
-            return;
+                System.out.println("Sorted array (Deterministic):");
+                printArray(arr1);
+                System.out.println("Deterministic Quick Sort Comparisons: " + comparisonsDet[0]);
+                System.out.println("Deterministic Quick Sort Swaps: " + swapsDet[0]);
+            } 
+            else if (ch == 2) {
+                System.out.println("\nOriginal array for randomized quick sort:");
+                printArray(arr2);
+
+                randomizedQuickSort(arr2, 0, arr2.size() - 1, comparisonsRand, swapsRand);
+
+                System.out.println("Sorted array (Randomized):");
+                printArray(arr2);
+                System.out.println("Randomized Quick Sort Comparisons: " + comparisonsRand[0]);
+                System.out.println("Randomized Quick Sort Swaps: " + swapsRand[0]);
+            } 
+            else if (ch == 3) {
+                break;
+            }
         }
 
-        int pivot = arr[arr.length / 2];
-        int[] left = Arrays.stream(arr).filter(x -> x < pivot).toArray();
-        int[] middle = Arrays.stream(arr).filter(x -> x == pivot).toArray();
-        int[] right = Arrays.stream(arr).filter(x -> x > pivot).toArray();
-
-        deterministicQuickSort(left);
-        deterministicQuickSort(right);
-
-        System.arraycopy(left, 0, arr, 0, left.length);
-        System.arraycopy(middle, 0, arr, left.length, middle.length);
-        System.arraycopy(right, 0, arr, left.length + middle.length, right.length);
-    }
-
-    public static void randomizedQuickSort(int[] arr) {
-        if (arr.length <= 1) {
-            return;
-        }
-
-        int pivotIndex = new Random().nextInt(arr.length);
-        int pivot = arr[pivotIndex];
-
-        int[] left = Arrays.stream(arr).filter(x -> x < pivot).toArray();
-        int[] middle = Arrays.stream(arr).filter(x -> x == pivot).toArray();
-        int[] right = Arrays.stream(arr).filter(x -> x > pivot).toArray();
-
-        randomizedQuickSort(left);
-        randomizedQuickSort(right);
-
-        System.arraycopy(left, 0, arr, 0, left.length);
-        System.arraycopy(middle, 0, arr, left.length, middle.length);
-        System.arraycopy(right, 0, arr, left.length + middle.length, right.length);
+        scanner.close();
     }
 }
