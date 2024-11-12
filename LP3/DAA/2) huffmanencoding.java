@@ -1,121 +1,97 @@
-#Write a program to implement Huffman Encoding using a greedy strategy.
 import java.util.*;
-public class job
-{
-public static void main(String args[])
-{
-Scanner sc=new Scanner(System.in);
-System.out.println(&quot;Enter the number of Jobs&quot;);
-int n=sc.nextInt();
-String a[]=new String[n];
-int b[]=new int[n];
-int c[]=new int[n];
-for(int i=0;i&lt;n;i++)
-{
-System.out.println(&quot;Enter the Jobs&quot;);
-a[i]=sc.next();
-System.out.println(&quot;Enter the Profit&quot;);
-b[i]=sc.nextInt();
-System.out.println(&quot;Enter the DeadLine&quot;);
-c[i]=sc.nextInt();
-}
-System.out.println(&quot;--Arranged Order--&quot;);
-System.out.print(&quot;Jobs: &quot;);
-for(int i=0;i&lt;n;i++)
-{
-System.out.print(a[i]+&quot; &quot;);
-}
-System.out.println();
-System.out.print(&quot;Profit: &quot;);
-for(int i=0;i&lt;n;i++)
-{
-System.out.print(b[i]+&quot; &quot;);
-}
-System.out.println();
-System.out.print(&quot;DeadLine:&quot;);
-for(int i=0;i&lt;n;i++)
-{
-System.out.print(c[i]+&quot; &quot;);
-}
-for(int i=0;i&lt;n-1;i++)
-{
-for(int j=i+1;j&lt;n;j++)
-{
-if(b[i]&lt;b[j])
-{
-int temp=b[i];
-b[i]=b[j];
-b[j]=temp;
-temp=c[i];
-c[i]=c[j];
-c[j]=temp;
-String temp1=a[i];
-a[i]=a[j];
-a[j]=temp1;
+
+class Node {
+    Node left;
+    Node right;
+    Character value;
+    int frequency;
+
+    public Node(Character value, int frequency) {
+        this.value = value;
+        this.frequency = frequency;
+    }
+
+    public Node(Node left, Node right, int frequency) {
+        this.left = left;
+        this.right = right;
+        this.frequency = frequency;
+    }
+
+    public boolean isLeaf() {
+        return this.left == null && this.right == null;
+    }
 }
 
-}
-}
-System.out.println();
-System.out.println(&quot;--Sorted Order--&quot;);
-System.out.print(&quot;Jobs: &quot;);
-for(int i=0;i&lt;n;i++)
-{
-System.out.print(a[i]+&quot; &quot;);
-}
-System.out.println();
-System.out.print(&quot;Profit: &quot;);
-for(int i=0;i&lt;n;i++)
-{
-System.out.print(b[i]+&quot; &quot;);
-}
-System.out.println();
-System.out.print(&quot;DeadLine:&quot;);
-for(int i=0;i&lt;n;i++)
-{
-System.out.print(c[i]+&quot; &quot;);
-}
-System.out.println();
-int max=c[0];
-for(int i=0;i&lt;n;i++)
-{
-if(c[i]&gt;max)
-{
-max=c[i];
-}
-}
-String x[]=new String[max];
-int xx[]=new int[max];
-int profit=0;
-for(int i=0;i&lt;n;i++)
-{
-int pp=c[i];
-pp=pp-1;
-if(x[pp]==null )
-{
-x[pp]=a[i];
-profit+=b[i];
-}
-else
-{
-while(pp!=-1)
-{
-if(x[pp]==null)
-{
-x[pp]=a[i];
-profit+=b[i];
-break;
-}
-pp=pp-1;
-}
-}
-}
-for(int i=0;i&lt;max;i++)
-{
-System.out.print(&quot;--&gt;&quot;+x[i]);
-}
-System.out.println();
+class HuffmanEncoding {
+    private PriorityQueue<Node> q;
+    private String inputString;
+    private Map<Character, String> encoding;
 
-System.out.print(&quot;Profit Earned&quot;+profit);
+    public HuffmanEncoding(String inputString) {
+        this.inputString = inputString;
+        this.encoding = new HashMap<>();
+        this.q = new PriorityQueue<>(Comparator.comparingInt(node -> node.frequency));
+    }
+
+    private void charFrequency() {
+        Map<Character, Integer> frequencyMap = new HashMap<>();
+        for (char c : inputString.toCharArray()) {
+            frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1);
+        }
+
+        for (Map.Entry<Character, Integer> entry : frequencyMap.entrySet()) {
+            q.add(new Node(entry.getKey(), entry.getValue()));
+        }
+    }
+
+    private void buildTree() {
+        while (q.size() > 1) {
+            Node n1 = q.poll();
+            Node n2 = q.poll();
+            Node newNode = new Node(n1, n2, n1.frequency + n2.frequency);
+            q.add(newNode);
+        }
+    }
+
+    private void helper(Node node, String binaryStr) {
+        if (node == null) return;
+        if (node.isLeaf()) {
+            encoding.put(node.value, binaryStr);
+            return;
+        }
+        helper(node.left, binaryStr + "0");
+        helper(node.right, binaryStr + "1");
+    }
+
+    public void huffmanEncoding() {
+        if (q.isEmpty()) return;
+        Node root = q.peek();
+        helper(root, "");
+    }
+
+    public void printEncoding() {
+        System.out.println(" Char | Huffman Code ");
+        for (Map.Entry<Character, String> entry : encoding.entrySet()) {
+            System.out.println(entry.getKey() +  " | " + entry.getValue());
+        }
+    }
+
+    public void encode() {
+        charFrequency();
+        buildTree();
+        huffmanEncoding();
+        printEncoding();
+    }
 }
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter string to be encoded: ");
+        String inputString = scanner.nextLine();
+
+        HuffmanEncoding encode = new HuffmanEncoding(inputString);
+        encode.encode();
+        scanner.close();
+    }
 }
