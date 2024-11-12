@@ -1,21 +1,54 @@
-# Write a program to solve a fractional Knapsack problem using a greedy method.
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-def fractional_knapsack():
-    weights=[10,20,30]
-    values=[60,100,120]
-    capacity=50
-    res=0
-    # Pair : [Weight,value]
-    for pair in sorted(zip(weights,values), key= lambda x: x[1]/x[0], reverse=True):
-        if capacity<=0: # Capacity completed - Bag fully filled 
-            break 
-        if pair[0]>capacity: # Current's weight with highest value/weight ratio Available Capacity
-            res+=int(capacity * (pair[1]/pair[0]))  # Completely fill the bag
-            capacity=0
-        elif pair[0]<=capacity: # Take the whole object
-            res+=pair[1]
-            capacity-=pair[0]
-    print(res)        
+class Item {
+    int weight;
+    int value;
 
-if __name__=="__main__":
-    fractional_knapsack()
+    Item(int weight, int value) {
+        this.weight = weight;
+        this.value = value;
+    }
+
+    double valuePerWeight() {
+        return (double) value / weight;
+    }
+}
+
+class Main {
+
+    public static void fractionalKnapsack() {
+        int[] weights = {10, 20, 30};
+        int[] values = {60, 100, 120};
+        int capacity = 50;
+        double res = 0.0;
+
+        List<Item> items = new ArrayList<>();
+        for (int i = 0; i < weights.length; i++) {
+            items.add(new Item(weights[i], values[i]));
+        }
+
+        items.sort(Comparator.comparingDouble(Item::valuePerWeight).reversed());
+
+        for (Item item : items) {
+            if (capacity <= 0) {
+                break;
+            }
+            if (item.weight > capacity) {
+                res += capacity * item.valuePerWeight();
+                capacity = 0;
+            } else {
+                res += item.value;
+                capacity -= item.weight;
+            }
+        }
+
+        System.out.println((int) res);
+    }
+
+    public static void main(String[] args) {
+        fractionalKnapsack();
+    }
+}
