@@ -1,35 +1,38 @@
-#Write a program to calculate Fibonacci numbers and find its step count.
-import java.util.Scanner;
+class Main {
 
-public class FibonacciWithStepCount {
-public static void main(String[] args) {
-Scanner scanner = new Scanner(System.in);
-System.out.print(&quot;Enter the number of Fibonacci numbers to calculate: &quot;);
-int n = scanner.nextInt();
+    public static int recursiveFibonacci(int n) {
+        if (n <= 1) {
+            return n;
+        } else {
+            return recursiveFibonacci(n - 1) + recursiveFibonacci(n - 2);
+        }
+    }
 
-long[] fibonacciSeries = new long[n];
-long stepCount = 0;
+    public static void nonRecursiveFibonacci(int n) {
+        int first = 0;
+        int second = 1;
+        
+        System.out.println(first);
+        System.out.println(second);
 
-if (n &gt;= 1) {
-fibonacciSeries[0] = 0;
-stepCount++;
-}
-if (n &gt;= 2) {
-fibonacciSeries[1] = 1;
-stepCount++;
-}
+        while (n - 2 > 0) {
+            int third = first + second;
+            first = second;
+            second = third;
+            System.out.println(third);
+            n--;
+        }
+    }
 
-for (int i = 2; i &lt; n; i++) {
-fibonacciSeries[i] = fibonacciSeries[i - 1] + fibonacciSeries[i - 2];
-stepCount += 3; // Each iteration includes 3 steps: addition, access previous two values, and
-assignment.
-}
+    public static void main(String[] args) {
+        int n = 10;
 
-System.out.println(&quot;Fibonacci Series:&quot;);
-for (int i = 0; i &lt; n; i++) {
-System.out.print(fibonacciSeries[i] + &quot; &quot;);
-}
+        System.out.println("Recursive Fibonacci:");
+        for (int i = 0; i < n; i++) {
+            System.out.println(recursiveFibonacci(i));
+        }
 
-System.out.println(&quot;\nTotal steps taken to calculate the Fibonacci series: &quot; + stepCount);
-}
+        System.out.println("\nNon-Recursive Fibonacci:");
+        nonRecursiveFibonacci(n);
+    }
 }
