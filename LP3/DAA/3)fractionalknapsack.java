@@ -1,3 +1,4 @@
+// https://takeuforward.org/data-structure/fractional-knapsack-problem-greedy-approach/
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
